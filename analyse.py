@@ -12,14 +12,41 @@ parsed = parse()
 
 
 def group_by_key_func(iterable, key_func):
+    """
+    Create a dictionary from an iterable such that the keys are the result of evaluating a key function on elements
+    of the iterable and the values are lists of elements all of which correspond to the key.
+
+    >>> def si(d): return sorted(d.items())
+    >>> si(group_by_key_func("a bb ccc d ee fff".split(), len))
+    [(1, ['a', 'd']), (2, ['bb', 'ee']), (3, ['ccc', 'fff'])]
+    >>> si(group_by_key_func([-1, 0, 1, 3, 6, 8, 9, 2], lambda x: x % 2))
+    [(0, [0, 6, 8, 2]), (1, [-1, 1, 3, 9])]
+    """
     result = defaultdict(list)
     for item in iterable:
         result[key_func(item)].append(item)
     return result
 
 
-def downloaded_graph():
-    sequences = json.loads(Path("downloaded.json").read_text())
+def oeis_graph():
+    """
+    Returns a graph where the nodes are sequences and an edge
+    indicates that at least one of the pages of two sequences
+    mentions the A-number of the other sequence somewhere.
+
+    The graph is based on the file full_sequences.json which
+    should be downloaded separately from
+    https://drive.google.com/file/d/1bN3LrTGRenfw-esiBe4GI0CqtIfPWjlC/view?usp=sharing
+    This contains about 100k sequences, not the full OEIS.
+    It may be significantly out of date when you run this code.
+    """
+    try:
+        sequences = json.loads(Path("full_sequences.json").read_text())
+    except Exception as e:
+        raise ValueError(
+            "Download the file full_sequences.json from "
+            "https://drive.google.com/file/d/1bN3LrTGRenfw-esiBe4GI0CqtIfPWjlC/view?usp=sharing"
+        ) from e
 
     graph = networkx.Graph()
     for anum, obj in sequences.items():
@@ -33,6 +60,18 @@ def downloaded_graph():
 
 
 def find_special():
+    """
+    Returns a dictionary {term: group} where:
+
+    - `term` is a number greater than a trillion with more than two distinct digits
+    - `group` is a list of 5 to 10 sequences (A-number strings)
+    - `term` is found in every sequence in `group`
+
+    The idea is that groups which are too small are more likely to be coincidences or
+    lacking in useful information for a viewer, while groups that are too big
+    tend to contain generic sequences like "powers of 2" where matching terms are
+    unsurprising and users are overloaded with information.
+    """
     by_term = defaultdict(set)
     for anum, seq in parsed.items():
         for term in seq.get("terms", []):
@@ -43,18 +82,23 @@ def find_special():
 
 
 def main():
-    graph = downloaded_graph()
+    graph = oeis_graph()
     components = list(map(frozenset, networkx.connected_components(graph)))
     components_by_anum = {anum: component for component in components for anum in component}
 
     good_groups = networkx.Graph()
     for group in find_special().values():
         by_component = group_by_key_func(group, lambda anum: components_by_anum[anum])
+        # Only consider groups with multiple subgroups, otherwise the relationship
+        # between all the sequences is already known.
         if len(by_component) <= 1:
             continue
 
         good_groups.add_node(frozenset(group))
 
+    # find_special is the starting point for creating groups, where one term
+    # is found in every sequence. But this leads to groups which are very similar but
+    # not identical. We merge groups together if they share at least two terms.
     for g1, g2 in itertools.combinations(good_groups, 2):
         if len(g1 & g2) >= 2:
             good_groups.add_edge(g1, g2)
@@ -64,9 +108,14 @@ def main():
 
     components = list(networkx.connected_components(good_groups))
     for group_component in components:
+        # This is the result of one or more simple groups from find_special merged together
+        # This means there might not be any terms that are found in all sequences in the group.
+        # Again, we avoid massive groups that are probably overwhelming or not that interesting
         group = frozenset.union(*group_component)
         if len(group) > 20:
             continue
+
+        # This is components in the oeis_graph, i.e. edges based on links/mentions, not terms
         by_component = group_by_key_func(group, lambda anum: components_by_anum[anum])
 
         subgroups = []
@@ -105,7 +154,7 @@ def main():
                 group=sorted(group),
                 subgroups=subgroups,
                 common_terms=[
-                    str(x)
+                    str(x)  # so javascript can read the full number from JSON
                     for x in sorted(x for x, count in counts.items() if count > 1)
                 ],
             )

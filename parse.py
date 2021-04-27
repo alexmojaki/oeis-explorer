@@ -2,16 +2,26 @@ from collections import defaultdict
 
 
 def raw_lines(filename):
-    with open(filename) as f:
-        result = f.readlines()
+    try:
+        with open(filename) as f:
+            result = f.readlines()
 
-    for i, line in enumerate(result):
-        if not line.startswith("#"):
-            assert line.startswith("A000001 ")
-            return result[i:]
+        for i, line in enumerate(result):
+            if not line.startswith("#"):
+                assert line.startswith("A000001 ")
+                return result[i:]
+    except Exception as e:
+        raise ValueError(
+            "Download and extract the files https://oeis.org/stripped.gz and https://oeis.org/names.gz. "
+            "The resulting files should be called `names` and `stripped`, no extensions."
+        ) from e
 
 
 def parse():
+    """
+    Returns a dictionary {anum: {terms: [ints], name: "string"}}
+    parsed from the raw files on the OEIS site.
+    """
     result = defaultdict(dict)
 
     for line in raw_lines("stripped"):
