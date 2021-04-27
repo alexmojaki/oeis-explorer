@@ -10,6 +10,7 @@ To run this code:
 
 - [Download `full_sequences.json` here](https://drive.google.com/file/d/1bN3LrTGRenfw-esiBe4GI0CqtIfPWjlC/view?usp=sharing).
 - `pip install networkx`
-- `python analyse.py`
+- `python analyse.py` to update `result.json`
+- Then in the `frontend` folder, run `npm install` and `npm start` to start a server and see the UI.
 
 At least Python 3.6 is required.
