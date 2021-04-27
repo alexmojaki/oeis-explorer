@@ -2,7 +2,7 @@
 
 This is a tool for exploring two different kinds of relationships between sequences in the OEIS: mentions (links) of other sequences on a sequence's page, and large numbers that appear in multiple different sequences.
 
-You can view the tool [here](https://alexmojaki.github.io/oeis-explorer) for more explanation.
+You can view the tool [here](https://alexmojaki.github.io/oeis-explorer/) for more explanation.
 
 You can also explore the resulting JSON data [here](https://github.com/alexmojaki/oeis-explorer/blob/master/frontend/src/result.json).
 
