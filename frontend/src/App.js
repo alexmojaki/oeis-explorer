@@ -79,7 +79,7 @@ const App = () => (
       <div className="panel" key={groupIndex}>
         {group.subgroups.map((subgroup, subgroupIndex) =>
           <div className="panel" key={subgroupIndex}>
-            {subgroup.map((seq) =>
+            {subgroup.nodes.map((seq) =>
               <Collapsible trigger={anumLink(seq.anum)} key={seq.anum} lazyRender>
                 {
                   seq.paths.length > 0 &&
@@ -119,6 +119,28 @@ const App = () => (
                     )}
                   </>
                 }
+                {
+                  seq.neighbours.length > 0 &&
+                  <>
+                    <h3>All neighbours</h3>
+                    <p>
+                      These are all the neighbours of this sequence in the graph,
+                      i.e. all the sequences either mentioned directly in this sequence's
+                      page or that mention this sequence in their own page.
+                    </p>
+                    {
+                      <ul>
+                        {
+                          seq.neighbours.map((neighbour, neighbourIndex) =>
+                            <li key={neighbourIndex}>
+                              {anumLink(neighbour)}
+                            </li>
+                          )
+                        }
+                      </ul>
+                    }
+                  </>
+                }
                 <h3>Terms:</h3>
                 <p>
                   This table shows all the terms at the start of this sequence that are mentioned
@@ -127,6 +149,17 @@ const App = () => (
                 <TermsTable terms={data.sequences[seq.anum].terms} anums={group.group}/>
               </Collapsible>
             )}
+            {/*
+            // Too expensive!
+            {
+              subgroup.on_shortest_paths.length > 0 &&
+              <Collapsible trigger="Other related sequences:" lazyRender>
+                <p>
+                  Sequences that appear on a shortest path between any two nodes in this subgroup:
+                </p>
+              </Collapsible>
+            }
+            */}
           </div>
         )}
         <Collapsible trigger="Common terms:" lazyRender>

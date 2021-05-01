@@ -107,7 +107,8 @@ def main():
     mentioned_anums = set()
 
     components = list(networkx.connected_components(good_groups))
-    for group_component in components:
+    for i, group_component in enumerate(components):
+        print(f"On component {i + 1} of {len(components)}")
         # This is the result of one or more simple groups from find_special merged together
         # This means there might not be any terms that are found in all sequences in the group.
         # Again, we avoid massive groups that are probably overwhelming or not that interesting
@@ -132,19 +133,39 @@ def main():
                 )
                 for anum in subgroup
             }
-            mentioned_anums.update(subgroup, *itertools.chain.from_iterable(paths.values()))
+            mentioned_anums.update(
+                subgroup,
+                *[graph[anum] for anum in subgroup],
+                *itertools.chain.from_iterable(paths.values()),
+            )
             subgroups.append(
-                [
-                    dict(
-                        anum=anum,
-                        paths=[
-                            dict(anum=path[-1], path=path[1:-1]) for path in paths[anum]
-                        ],
-                    )
-                    for anum in sorted(
-                        subgroup, key=lambda n: (sum(map(len, paths[n])), n)
-                    )
-                ]
+                dict(
+                    nodes=[
+                        dict(
+                            anum=anum,
+                            paths=[
+                                dict(anum=path[-1], path=path[1:-1])
+                                for path in paths[anum]
+                            ],
+                            neighbours=sorted(graph[anum]),
+                        )
+                        for anum in sorted(
+                            subgroup, key=lambda n: (sum(map(len, paths[n])), n)
+                        )
+                    ],
+                    # Too expensive!
+                    # on_shortest_paths=sorted(
+                    #     set(
+                    #         itertools.chain.from_iterable(
+                    #             itertools.chain.from_iterable(
+                    #                 networkx.all_shortest_paths(graph, u, v)
+                    #                 for u, v in itertools.combinations(subgroup, 2)
+                    #             )
+                    #         )
+                    #     )
+                    #     - set(subgroup)
+                    # ),
+                )
             )
 
         counts = Counter(num for anum in group for num in set(parsed[anum]["terms"]))
