@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/oeis-explorer/static/css/main.aefa1c21.chunk.css",
-    "main.js": "/oeis-explorer/static/js/main.681bdea6.chunk.js",
-    "main.js.map": "/oeis-explorer/static/js/main.681bdea6.chunk.js.map",
+    "main.js": "/oeis-explorer/static/js/main.c43e7286.chunk.js",
+    "main.js.map": "/oeis-explorer/static/js/main.c43e7286.chunk.js.map",
     "runtime-main.js": "/oeis-explorer/static/js/runtime-main.6cc4f9fc.js",
     "runtime-main.js.map": "/oeis-explorer/static/js/runtime-main.6cc4f9fc.js.map",
     "static/js/2.6078fbfd.chunk.js": "/oeis-explorer/static/js/2.6078fbfd.chunk.js",
@@ -15,6 +15,6 @@
     "static/js/runtime-main.6cc4f9fc.js",
     "static/js/2.6078fbfd.chunk.js",
     "static/css/main.aefa1c21.chunk.css",
-    "static/js/main.681bdea6.chunk.js"
+    "static/js/main.c43e7286.chunk.js"
   ]
 }
