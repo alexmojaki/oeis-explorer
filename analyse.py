@@ -8,7 +8,24 @@ import networkx
 
 from parse import parse
 
-parsed = parse()
+
+def supplemented_parsed():
+    result = parse()
+    for anum, data in list(result.items()):
+        for factor in [2, 3]:
+            result[f"{anum} * {factor}"] = dict(
+                name=data.get("name", "OEIS name missing"),
+                terms=[x * factor for x in data.get("terms", [])],
+            )
+        for add in [1, 2, 3]:
+            result[f"{anum} + {add}"] = dict(
+                name=data.get("name", "OEIS name missing"),
+                terms=[x + add for x in data.get("terms", [])],
+            )
+    return result
+
+
+parsed = supplemented_parsed()
 
 
 def group_by_key_func(iterable, key_func):
@@ -78,7 +95,11 @@ def find_special():
             if term > 10 ** 12 and len(set(str(term))) > 2:
                 by_term[term].add(anum)
 
-    return {term: group for term, group in by_term.items() if 5 <= len(group) <= 10}
+    return {
+        term: group
+        for term, group in by_term.items()
+        if 5 <= len(group) <= 10 and len(set(anum[-3:] for anum in group)) > 1
+    }
 
 
 def main():
@@ -88,7 +109,9 @@ def main():
 
     good_groups = networkx.Graph()
     for group in find_special().values():
-        by_component = group_by_key_func(group, lambda anum: components_by_anum[anum])
+        by_component = group_by_key_func(
+            group, lambda anum: components_by_anum[anum.split()[0]]
+        )
         # Only consider groups with multiple subgroups, otherwise the relationship
         # between all the sequences is already known.
         if len(by_component) <= 1:
@@ -117,25 +140,28 @@ def main():
             continue
 
         # This is components in the oeis_graph, i.e. edges based on links/mentions, not terms
-        by_component = group_by_key_func(group, lambda anum: components_by_anum[anum])
+        by_component = group_by_key_func(
+            group, lambda anum: components_by_anum[anum.split()[0]]
+        )
 
         subgroups = []
         subgroup: list
         for subgroup in sorted(by_component.values(), key=len):
+            clean_subgroup = [anum.split()[0] for anum in subgroup]
             paths = {
                 anum: sorted(
                     [
                         networkx.shortest_path(graph, anum, other)
-                        for other in subgroup
+                        for other in clean_subgroup
                         if other != anum
                     ],
                     key=len,
                 )
-                for anum in subgroup
+                for anum in clean_subgroup
             }
             mentioned_anums.update(
                 subgroup,
-                *[graph[anum] for anum in subgroup],
+                *[graph[anum] for anum in clean_subgroup],
                 *itertools.chain.from_iterable(paths.values()),
             )
             subgroups.append(
@@ -145,12 +171,13 @@ def main():
                             anum=anum,
                             paths=[
                                 dict(anum=path[-1], path=path[1:-1])
-                                for path in paths[anum]
+                                for path in paths[anum.split()[0]]
                             ],
-                            neighbours=sorted(graph[anum]),
+                            neighbours=sorted(graph[anum.split()[0]]),
                         )
                         for anum in sorted(
-                            subgroup, key=lambda n: (sum(map(len, paths[n])), n)
+                            subgroup,
+                            key=lambda n: (sum(map(len, paths[n.split()[0]])), n),
                         )
                     ],
                     # Too expensive!
