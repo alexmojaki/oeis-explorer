@@ -27,6 +27,7 @@ table th {
   background-color: white; }
 
 .Collapsible__contentInner {
+  overflow-x: auto;
   padding: 10px;
   border: 1px solid #ebebeb;
   border-top: 0; }
