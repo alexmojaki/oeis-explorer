@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.css": "/oeis-explorer/static/css/main.aefa1c21.chunk.css",
+    "main.css": "/oeis-explorer/static/css/main.4d916cd3.chunk.css",
     "main.js": "/oeis-explorer/static/js/main.c43e7286.chunk.js",
     "main.js.map": "/oeis-explorer/static/js/main.c43e7286.chunk.js.map",
     "runtime-main.js": "/oeis-explorer/static/js/runtime-main.6cc4f9fc.js",
@@ -8,13 +8,13 @@
     "static/js/2.6078fbfd.chunk.js": "/oeis-explorer/static/js/2.6078fbfd.chunk.js",
     "static/js/2.6078fbfd.chunk.js.map": "/oeis-explorer/static/js/2.6078fbfd.chunk.js.map",
     "index.html": "/oeis-explorer/index.html",
-    "static/css/main.aefa1c21.chunk.css.map": "/oeis-explorer/static/css/main.aefa1c21.chunk.css.map",
+    "static/css/main.4d916cd3.chunk.css.map": "/oeis-explorer/static/css/main.4d916cd3.chunk.css.map",
     "static/js/2.6078fbfd.chunk.js.LICENSE.txt": "/oeis-explorer/static/js/2.6078fbfd.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.6cc4f9fc.js",
     "static/js/2.6078fbfd.chunk.js",
-    "static/css/main.aefa1c21.chunk.css",
+    "static/css/main.4d916cd3.chunk.css",
     "static/js/main.c43e7286.chunk.js"
   ]
 }
